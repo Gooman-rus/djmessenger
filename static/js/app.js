@@ -15,10 +15,15 @@ var DjMessenger = angular.module('DjMessenger', [
                 cache: false,
                 templateUrl: 'static/partials/home.html',
             })
-            .state('root.login', {
+            .state('login', {
                 url: '/login',
                 cache: false,
                 templateUrl: 'static/partials/login.html',
+            })
+            .state('register', {
+                url: '/register',
+                cache: false,
+                templateUrl: 'static/partials/register.html',
             });
 
         // if none of the above states are matched, use this as the fallback
