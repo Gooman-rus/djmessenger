@@ -18,17 +18,17 @@ from django.conf.urls import url, include
 from tastypie.api import Api
 from django.contrib import admin
 
-from accounts.views import AccountsView
-from api.api import AccountsResource
+from accounts.views import MainView
+from api.api import UserResource
 
 
 v1_api = Api(api_name='v1')
-v1_api.register(AccountsResource())
+v1_api.register(UserResource())
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(v1_api.urls)),
-    url(r'^$', AccountsView.as_view()),
+    url(r'^$', MainView.as_view()),
     #url(r'^login', AccountsView.as_view()),
     #url(r'^(login)?$', AccountsView.as_view()),
     #url(r'^.*$', AccountsView.as_view(), name='home'),

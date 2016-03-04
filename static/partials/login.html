@@ -1,43 +1,42 @@
 <!--<link rel="stylesheet" href="../static/style/css/my/login.css" type="text/css">-->
-<div class="jumbotron">
-    <div class="content">
-        <div class="row">
-            <div class="col-md-6">
 
-                <form class="form-horizontal" action="">
-                    <fieldset>
-                        <div id="legend">
-                            <legend class="">Login <a hrev="/#/register">Register</a></legend>
+<div class="content">
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-horizontal" action="">
+                <fieldset>
+                    <div id="legend">
+                        <legend class="">Login</legend>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="username">Username</label>
+                        <div class="controls">
+                            <input id="username" name="username" placeholder="" class="form-control input-lg"
+                                   type="text">
+                            <p class="help-block">Username can contain any letters or numbers, without spaces</p>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="username">Username</label>
-                            <div class="controls">
-                                <input id="username" name="username" placeholder="" class="form-control input-lg" type="text">
-                                <p class="help-block">Username can contain any letters or numbers, without spaces</p>
-                            </div>
-                        </div>
+                    </div>
 
-                        <div class="control-group">
-                            <label class="control-label" for="password">Password</label>
-                            <div class="controls">
-                                <input id="password" name="password" placeholder="" class="form-control input-lg" type="password">
-                                <p class="help-block">Password should be at least 6 characters</p>
-                            </div>
+                    <div class="control-group">
+                        <label class="control-label" for="password">Password</label>
+                        <div class="controls">
+                            <input id="password" name="password" placeholder="" class="form-control input-lg"
+                                   type="password">
+                            <p class="help-block">Password should be at least 6 characters</p>
                         </div>
+                    </div>
 
-                        <div class="control-group">
-                            <input type="checkbox" class="check" /> Remember me
+                    <div class="control-group">
+                        <input type="checkbox" class="check" /> Remember me
+                    </div>
+                    <div class="control-group">
+                        <!-- Button -->
+                        <div class="controls">
+                            <button class="btn btn-info">Login</button>
                         </div>
-                        <div class="control-group">
-                            <!-- Button -->
-                            <div class="controls">
-                                <button class="btn btn-info">Login</button>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
-
-            </div>
+                    </div>
+                </fieldset>
+            </form>
         </div>
     </div>
 </div>

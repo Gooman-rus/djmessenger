@@ -7,10 +7,10 @@ from tastypie import serializers
 
 from models import Accounts
 
-class AccountsView(TemplateView):
+class MainView(TemplateView):
     template_name = 'index.html'
-    model = Accounts
+    #model = Accounts
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
-        return super(AccountsView, self).dispatch(*args, **kwargs)
+        return super(MainView, self).dispatch(*args, **kwargs)
