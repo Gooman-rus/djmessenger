@@ -19,6 +19,7 @@ from django.contrib.auth import authenticate, login, logout
 from tastypie.http import HttpUnauthorized, HttpForbidden
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
+from django.http import HttpResponse
 
 class UserResource(ModelResource):
     class Meta:
@@ -35,6 +36,9 @@ class UserResource(ModelResource):
             url(r'^(?P<resource_name>%s)/logout%s$' %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('logout'), name='api_logout'),
+            url(r'^(?P<resource_name>%s)/logged_in%s$' %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('logged_in'), name='api_logged_in'),
         ]
 
     def login(self, request, **kwargs):
@@ -70,3 +74,15 @@ class UserResource(ModelResource):
             return self.create_response(request, { 'success': True })
         else:
             return self.create_response(request, { 'success': False }, HttpUnauthorized)
+
+
+    def logged_in(self, request, **kwargs):
+        self.method_check(request, allowed=['get'])
+        if request.user.is_authenticated():
+            return self.create_response(request, {
+                'logged_in': True
+            })
+        else:
+            return self.create_response(request, {
+                'logged_in': False
+            })

@@ -52,9 +52,15 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-class="{ active: isActive('/register')}"><a href="#/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                    <li ng-class="{ active: isActive('/login')}"><a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a>
-                     <li><a href="#/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                    <li ng-if="logged_in == false" ng-class="{ active: isActive('/register')}">
+                        <a href="#/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a>
+                    </li>
+                    <li ng-if="logged_in == false" ng-class="{ active: isActive('/login')}">
+                        <a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+                    </li>
+                    <li ng-if="logged_in == true">
+                        <a href="" ng-click="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                    </li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
