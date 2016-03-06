@@ -92,6 +92,7 @@ var DjMessenger = angular.module('DjMessenger', [
         serverOp.get('user/logged_in/')
         .success(function (check) {
             $scope.logged_in = check.logged_in;
+            $scope.user_login = check.username;
             console.log('Logged in = ' + $scope.logged_in);
         })
         .error(function (error) {
@@ -99,16 +100,17 @@ var DjMessenger = angular.module('DjMessenger', [
             console.log($scope.status);
         });
 
-        $scope.submit = function ($event) {
-            var user_data = { 'username': $scope.username, 'password': $scope.password };
-            if ($scope.name === '' || $scope.description === '') {
+        $scope.submit = function () {
+            if (!$scope.loginForm.username.$valid || !$scope.loginForm.password.$valid) {
                 console.log('empty input');
                 return;
             }
-            serverOp.post('user/login/', user_data)
+            var user_data = { 'username': $scope.username, 'password': $scope.password };
+
+            serverOp.post('user/login/', user_data) // login to the server
                 .success(function (response) {
-                    $scope.name = '';
-                    $scope.description = '';
+                    $scope.username = '';
+                    $scope.password = '';
                     console.log('success login');
                     serverOp.get('user/logged_in/')
                         .success(function (check) {
@@ -132,6 +134,7 @@ var DjMessenger = angular.module('DjMessenger', [
                     serverOp.get('user/logged_in/')
                         .success(function (check) {
                             $scope.logged_in = check.logged_in;
+                            $scope.user_login = '';
                             console.log('Logged in = ' + $scope.logged_in);
                         })
                         .error(function (error) {

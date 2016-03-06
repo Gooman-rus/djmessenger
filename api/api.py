@@ -80,7 +80,8 @@ class UserResource(ModelResource):
         self.method_check(request, allowed=['get'])
         if request.user.is_authenticated():
             return self.create_response(request, {
-                'logged_in': True
+                'logged_in': True,
+                'username': request.user
             })
         else:
             return self.create_response(request, {

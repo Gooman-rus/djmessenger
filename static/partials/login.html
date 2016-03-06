@@ -3,7 +3,7 @@
 <div class="content">
     <div class="row">
         <div class="col-md-6">
-            <form class="form-horizontal">
+            <form class="form-horizontal" name="loginForm">
                 <fieldset>
                     <div id="legend">
                         <legend class="">Login</legend>
@@ -12,7 +12,7 @@
                         <label class="control-label" for="username">Username</label>
                         <div class="controls">
                             <input id="username" name="username" placeholder="" class="form-control input-lg"
-                                   type="text" ng-model="username" />
+                                   type="text" ng-model="username" ng-minlength="5" required />
                             <p class="help-block">Username can contain any letters or numbers, without spaces</p>
                         </div>
                     </div>
@@ -21,7 +21,7 @@
                         <label class="control-label" for="password">Password</label>
                         <div class="controls">
                             <input id="password" name="password" placeholder="" class="form-control input-lg"
-                                   type="password" ng-model="password" />
+                                   type="password" ng-model="password" ng-minlength="5" required />
                             <p class="help-block">Password should be at least 6 characters</p>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
                     <div class="control-group">
                         <!-- Button -->
                         <div class="controls">
-                            <button class="btn btn-info" ng-click="submit($event)">Login</button>
+                            <button class="btn btn-info" ng-click="submit()">Login</button>
                         </div>
                     </div>
                 </fieldset>
