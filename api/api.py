@@ -1,18 +1,3 @@
-
-
-
-# class AccountsResource(ModelResource):
-#      """
-#      API Facet
-#      """
-#      class Meta:
-#          queryset = User.objects.all()
-#          resource_name = 'user'
-#          allowed_methods = ['post', 'get']
-#          authentication = Authentication()
-#          authorization = Authorization()
-#          alwayss_return_data = True
-
 from tastypie.resources import ModelResource
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -20,6 +5,7 @@ from tastypie.http import HttpUnauthorized, HttpForbidden
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from django.http import HttpResponse
+
 
 class UserResource(ModelResource):
     class Meta:
