@@ -41,18 +41,26 @@ var DjMessenger = angular.module('DjMessenger', [
                     content: { templateUrl: 'static/partials/register.html' }
                 }
             })
-            .state('success_login', {
-                url: '/success_login',
+            .state('test_api', {
+                url: '/test_api',
                 cache: false,
-                data : { pageTitle: 'Success login' },
+                data : { pageTitle: 'Test API - GET data' },
                 views: {
                     nav: { templateUrl: 'static/partials/navbar.html' },
-                    content: { templateUrl: 'static/partials/success_login.html' }
+                    content: {
+                        templateUrl: 'static/partials/test_api.html',
+                        controller: 'testApiCtrl',
+                    }
                 }
             });
 
         // if none of the above states are matched, use this as the fallback
         $urlRouterProvider.otherwise('/');
+    }])
+
+    .config(['$httpProvider', function($httpProvider) {
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     }])
 
     .factory('serverOp', ['$http', function ($http) {
@@ -163,6 +171,19 @@ var DjMessenger = angular.module('DjMessenger', [
                     console.log($scope.status);
                 });
         }
+
+
+    })
+
+    .controller('testApiCtrl', function ($scope, $state, serverOp) {
+        serverOp.get('user/2/')
+                .success(function (data) {
+                    console.log(data);
+                })
+                .error(function (error) {
+                    $scope.status = 'Unable to GET data: ' + error.message;
+                    console.log($scope.status);
+                });
 
 
     })

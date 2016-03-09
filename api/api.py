@@ -1,11 +1,12 @@
+from tastypie.authorization import DjangoAuthorization
 from tastypie.resources import ModelResource
 from django.contrib.auth.models import User
+from tastypie.authentication import SessionAuthentication
 from django.contrib.auth import authenticate, login, logout
 from tastypie.http import HttpUnauthorized, HttpForbidden
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from django.http import HttpResponse
-
 
 class UserResource(ModelResource):
     class Meta:
@@ -13,6 +14,8 @@ class UserResource(ModelResource):
         fields = ['first_name', 'last_name', 'email']
         allowed_methods = ['get', 'post']
         resource_name = 'user'
+        authentication = SessionAuthentication()
+        authorization = DjangoAuthorization()
 
     def override_urls(self):
         return [
@@ -40,18 +43,19 @@ class UserResource(ModelResource):
             if user.is_active:
                 login(request, user)
                 return self.create_response(request, {
-                    'success': True
+                    'success': True,
+                    'username': user.username
                 })
             else:
                 return self.create_response(request, {
                     'success': False,
                     'reason': 'disabled',
-                    }, HttpForbidden )
+                }, HttpForbidden )
         else:
             return self.create_response(request, {
                 'success': False,
                 'reason': 'incorrect',
-                }, HttpUnauthorized )
+            }, HttpUnauthorized )
 
     def logout(self, request, **kwargs):
         self.method_check(request, allowed=['get'])

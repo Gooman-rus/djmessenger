@@ -19,11 +19,10 @@
 <body>
 
 <div class="container">
+    {% csrf_token %}
     <div ui-view name="nav"></div>
     <div ui-view name="content"></div>
 </div>
-
-</div><!-- /.container -->
 
 </body>
 </html>
