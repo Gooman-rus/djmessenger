@@ -1,4 +1,5 @@
 from tastypie.authorization import DjangoAuthorization, Authorization
+from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.resources import ModelResource
 from django.contrib.auth.models import User
 from tastypie.authentication import SessionAuthentication, Authentication
@@ -6,8 +7,6 @@ from django.contrib.auth import authenticate, login, logout
 from tastypie.http import HttpUnauthorized, HttpForbidden
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
-from django.http import HttpResponse
-from tastypie import fields
 
 from tastypie_extras.exceptions import CustomBadRequest
 
@@ -91,7 +90,7 @@ class CreateUserResource(ModelResource):
         allowed_methods = ['post']
         always_return_data = True
         #authentication = SessionAuthentication()
-        #authorization = Authorization()
+        authorization = Authorization()
         queryset = User.objects.all()
         resource_name = 'create_user'
         always_return_data = True
@@ -107,9 +106,9 @@ class CreateUserResource(ModelResource):
         #                     .format(missing_key=field))
 
         REQUIRED_USER_FIELDS = ("username", "email", "first_name", "last_name",
-                                "raw_password")
+                                "password")
         for field in REQUIRED_USER_FIELDS:
-            if field not in bundle.data["user"]:
+            if field not in bundle.data:
                 raise CustomBadRequest(
                     code="missing_key",
                     message="Must provide {missing_key} when creating a user."
@@ -118,16 +117,16 @@ class CreateUserResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         try:
-            email = bundle.data["user"]["email"]
-            username = bundle.data["user"]["username"]
-            if User.objects.filter(email=email):
-                raise CustomBadRequest(
-                    code="duplicate_exception",
-                    message="That email is already used.")
+            email = bundle.data['email']
+            username = bundle.data['username']
             if User.objects.filter(username=username):
                 raise CustomBadRequest(
                     code="duplicate_exception",
                     message="That username is already used.")
+            if User.objects.filter(email=email):
+                raise CustomBadRequest(
+                    code="duplicate_exception",
+                    message="That email is already used.")
         except KeyError as missing_key:
             raise CustomBadRequest(
                 code="missing_key",
@@ -136,7 +135,13 @@ class CreateUserResource(ModelResource):
         except User.DoesNotExist:
             pass
 
-        # setting resource_name to `user_profile` here because we want
-        # resource_uri in response to be same as UserProfileResource resource
-        self._meta.resource_name = UserResource._meta.resource_name
-        return super(CreateUserResource, self).obj_create(bundle, **kwargs)
+        bundle.obj = User.objects.create_user(bundle.data['username'],
+                                              bundle.data['email'],
+                                              bundle.data['password'])
+        bundle.obj.first_name = bundle.data['first_name']
+        bundle.obj.last_name = bundle.data['last_name']
+        self.is_valid(bundle)
+
+        if bundle.errors:
+            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+        return bundle

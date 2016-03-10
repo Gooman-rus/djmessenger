@@ -141,8 +141,8 @@ var DjMessenger = angular.module('DjMessenger', [
 
     })
 
-    .controller('userCtrl', function ($scope, $state, serverOp) {
-
+    .controller('userCtrl', function ($scope, $state, $timeout, serverOp) {
+        $scope.showError = false;
         $scope.submit = function() {
             if (!$scope.loginForm.username.$valid || !$scope.loginForm.password.$valid) {
                 console.log('empty input');
@@ -167,8 +167,20 @@ var DjMessenger = angular.module('DjMessenger', [
                         });
                 })
                 .error(function (error) {
-                    $scope.status = 'Unable to logout: ' + error.message;
+                    $scope.status = 'Unable to login: ' + error.reason;
                     console.log($scope.status);
+                    if (error.reason == 'incorrect') {
+                        $scope.showError = false;
+                        $scope.doFade = false;
+
+                        $scope.showError = true;
+
+                        $scope.errorMessage = 'Password is incorrent.';
+
+                        $timeout(function(){
+                          $scope.doFade = true;
+                        }, 2500);
+                    }
                 });
         }
 
