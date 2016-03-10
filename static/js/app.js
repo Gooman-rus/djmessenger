@@ -28,7 +28,7 @@ var DjMessenger = angular.module('DjMessenger', [
                     nav: { templateUrl: 'static/partials/navbar.html' },
                     content: {
                         templateUrl: 'static/partials/login.html',
-                        controller: 'userCtrl',
+                        controller: 'userLoginCtrl',
                     }
                 }
             })
@@ -102,34 +102,30 @@ var DjMessenger = angular.module('DjMessenger', [
     ])
 
     .controller('navbarCtrl', function ($scope, $location, serverOp) {
-
         // navbar active link
         $scope.isActive = function (viewLocation) {
             return viewLocation === $location.path();
         };
-        serverOp.get('user/logged_in/')
-            .success(function (check) {
-                $scope.logged_in = check.logged_in;
-                $scope.user_login = check.username;
-                console.log('Logged in = ' + $scope.logged_in);
-            })
-            .error(function (error) {
-                $scope.status = 'Error checking logged in: ' + error.message;
-                console.log($scope.status);
-            });
+
+        $scope.checkLoggedIn = function() {
+            serverOp.get('user/logged_in/')
+                .success(function (check) {
+                    $scope.logged_in = check.logged_in;
+                    $scope.user_login = check.username;
+                    console.log('Logged in = ' + $scope.logged_in);
+                })
+                .error(function (error) {
+                    $scope.status = 'Error checking logged in: ' + error.message;
+                    console.log($scope.status);
+                });
+        }
+
+        $scope.checkLoggedIn();
+
         $scope.logout = function() {
             serverOp.get('user/logout/')
                 .success(function (data) {
-                    serverOp.get('user/logged_in/')
-                        .success(function (check) {
-                            $scope.logged_in = check.logged_in;
-                            $scope.user_login = '';
-                            console.log('Logged in = ' + $scope.logged_in);
-                        })
-                        .error(function (error) {
-                            $scope.status = 'Error checking logged in: ' + error.message;
-                            console.log($scope.status);
-                        });
+                    $scope.checkLoggedIn();
                     console.log('logged out');
                 })
                 .error(function (error) {
@@ -141,11 +137,44 @@ var DjMessenger = angular.module('DjMessenger', [
 
     })
 
-    .controller('userCtrl', function ($scope, $state, $timeout, serverOp) {
-        $scope.showError = false;
+    .controller('userLoginCtrl', function ($scope, $state, $timeout, serverOp) {
+        $scope.checkLoggedIn = function() {
+            serverOp.get('user/logged_in/')
+                .success(function (check) {
+                    $scope.logged_in = check.logged_in;
+                    $scope.user_login = check.username;
+                    if ($scope.logged_in) {
+                        $state.go('home');
+                    }
+
+                    console.log('Logged in = ' + $scope.logged_in);
+                })
+                .error(function (error) {
+                    $scope.status = 'Error checking logged in: ' + error.message;
+                    console.log($scope.status);
+                });
+        }
+
+        $scope.checkLoggedIn();
+
+        $scope.showAlert = function (message) {
+            $scope.showError = true;
+            $scope.errorMessage = message;
+        }
+
+        $scope.closeAlert = function() {
+            $scope.showError = false;
+        }
+
+        $scope.closeAlert();
+
         $scope.submit = function() {
-            if (!$scope.loginForm.username.$valid || !$scope.loginForm.password.$valid) {
-                console.log('empty input');
+            if (!$scope.loginForm.username.$valid) {
+                $scope.showAlert('Invalid username.');
+                return;
+            }
+            if (!$scope.loginForm.password.$valid) {
+                $scope.showAlert('Invalid password.');
                 return;
             }
             var user_data = { 'username': $scope.username, 'password': $scope.password };
@@ -153,33 +182,15 @@ var DjMessenger = angular.module('DjMessenger', [
                 .success(function (response) {
                     $scope.username = '';
                     $scope.password = '';
-                    console.log('success login');
-                    serverOp.get('user/logged_in/')
-                        .success(function (check) {
-                            $scope.logged_in = check.logged_in;
-                            $scope.user_login = check.username;
-                            $state.go('home');
-                            console.log('Logged in = ' + $scope.logged_in);
-                        })
-                        .error(function (error) {
-                            $scope.status = 'Error checking logged in: ' + error.message;
-                            console.log($scope.status);
-                        });
+                    $scope.checkLoggedIn();
                 })
                 .error(function (error) {
                     $scope.status = 'Unable to login: ' + error.reason;
-                    console.log($scope.status);
                     if (error.reason == 'incorrect') {
-                        $scope.showError = false;
-                        $scope.doFade = false;
-
-                        $scope.showError = true;
-
-                        $scope.errorMessage = 'Password is incorrent.';
-
-                        $timeout(function(){
-                          $scope.doFade = true;
-                        }, 2500);
+                        $scope.showAlert("Username or Password is incorrect.");
+                    }
+                    if (error.reason == 'disabled') {
+                        $scope.showAlert('User <' + $scope.username + '> is inactive.');
                     }
                 });
         }
@@ -207,33 +218,3 @@ var DjMessenger = angular.module('DjMessenger', [
 
 
     })
-
-
-//    .controller('loginCtrl', function ($scope, serverOp) {
-//        $scope.submit = function ($event) {
-//            var user_data = { 'username': $scope.username, 'password': $scope.password };
-//            if ($scope.name === '' || $scope.description === '') {
-//                console.log('empty input');
-//                return;
-//            }
-//            serverOp.post('user/login/', user_data)
-//                .success(function (myjobs) {
-////                    $scope.name = '';
-////                    $scope.description = '';
-////                    console.log('success login');
-//                    serverOp.get('user/logged_in/')
-//                        .success(function (check) {
-//                            $scope.logged_in = check.logged_in;
-//                            console.log('Logged in = ' + $scope.logged_in);
-//                        })
-//                        .error(function (error) {
-//                            $scope.status = 'Error checking logged in: ' + error.message;
-//                            console.log($scope.status);
-//                        });
-//                })
-//                .error(function (error) {
-//                    $scope.status = 'Unable to login: ' + error.message;
-//                    console.log($scope.status);
-//                });
-//        }
-//    })

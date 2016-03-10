@@ -23,15 +23,12 @@ from api.api import UserResource, CreateUserResource
 
 v1_api = Api(api_name='v1')
 v1_api.register(UserResource())
-
-v2_api = Api(api_name='v2')
-v2_api.register(CreateUserResource())
+v1_api.register(CreateUserResource())
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(v1_api.urls)),
-    url(r'^api/', include(v2_api.urls)),
     url(r'^$', MainView.as_view()),
     #url(r'^login', AccountsView.as_view()),
     #url(r'^(login)?$', AccountsView.as_view()),

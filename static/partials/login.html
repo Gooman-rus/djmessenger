@@ -3,21 +3,27 @@
 <div class="content">
     <div class="row">
         <div class="col-md-6">
-            <form class="form-horizontal" name="loginForm">
+            <form class="form-horizontal" name="loginForm" ng-show="logged_in == false">
                 <fieldset>
                     <div id="legend">
                         <legend class="">Login</legend>
                     </div>
-                    <div style="padding: 5px;">
-                    <div data-ng-show="showError" ng-class="{fade:doFade}" class="alert alert-danger">
+                   <!-- <div data-ng-show="showError" ng-class="{fade:doFade}" class="alert alert-danger">
                         <strong>Error:</strong> {{errorMessage}}
-                    </div></div>
+                    </div>-->
+                    <div ng-if="showError == true" class="alert alert-danger alert-dismissible fade in" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                                ng-click="closeAlert()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Error:</strong> {{errorMessage}}
+                    </div>
                     <div class="control-group">
                         <label class="control-label" for="username">Username</label>
                         <div class="controls">
                             <input id="username" name="username" placeholder="" class="form-control input-lg"
                                    type="text" ng-model="username" ng-minlength="3" required />
-                            <p class="help-block">Username can contain any letters or numbers, without spaces</p>
+                            <!--<p class="help-block">Username can contain any letters or numbers, without spaces</p>-->
                         </div>
                     </div>
 
@@ -26,7 +32,7 @@
                         <div class="controls">
                             <input id="password" name="password" placeholder="" class="form-control input-lg"
                                    type="password" ng-model="password" ng-minlength="5" required />
-                            <p class="help-block">Password should be at least 6 characters</p>
+                            <!--<p class="help-block">Password should be at least 6 characters</p>-->
                         </div>
                     </div>
 
