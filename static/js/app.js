@@ -28,7 +28,7 @@ var DjMessenger = angular.module('DjMessenger', [
                     nav: { templateUrl: 'static/partials/navbar.html' },
                     content: {
                         templateUrl: 'static/partials/login.html',
-                        controller: 'userLoginCtrl',
+                        controller: 'userCtrl',
                     }
                 }
             })
@@ -38,7 +38,9 @@ var DjMessenger = angular.module('DjMessenger', [
                 data : { pageTitle: 'Register' },
                    views: {
                     nav: { templateUrl: 'static/partials/navbar.html' },
-                    content: { templateUrl: 'static/partials/register.html' }
+                    content: {
+                        templateUrl: 'static/partials/register.html',
+                        controller: 'userCtrl', }
                 }
             })
             .state('test_api', {
@@ -115,7 +117,7 @@ var DjMessenger = angular.module('DjMessenger', [
                     console.log('Logged in = ' + $scope.logged_in);
                 })
                 .error(function (error) {
-                    $scope.status = 'Error checking logged in: ' + error.message;
+                    $scope.status = 'Error checking logged in: ' + error;
                     console.log($scope.status);
                 });
         }
@@ -137,7 +139,7 @@ var DjMessenger = angular.module('DjMessenger', [
 
     })
 
-    .controller('userLoginCtrl', function ($scope, $state, $timeout, serverOp) {
+    .controller('userCtrl', function ($scope, $state, $timeout, serverOp) {
         $scope.checkLoggedIn = function() {
             serverOp.get('user/logged_in/')
                 .success(function (check) {
@@ -160,6 +162,9 @@ var DjMessenger = angular.module('DjMessenger', [
         $scope.showAlert = function (message) {
             $scope.showError = true;
             $scope.errorMessage = message;
+            $timeout(function() {
+                $scope.showError = false;
+            }, 5000);
         }
 
         $scope.closeAlert = function() {
@@ -168,7 +173,7 @@ var DjMessenger = angular.module('DjMessenger', [
 
         $scope.closeAlert();
 
-        $scope.submit = function() {
+        $scope.submitLoginForm = function() {
             if (!$scope.loginForm.username.$valid) {
                 $scope.showAlert('Invalid username.');
                 return;
@@ -195,6 +200,31 @@ var DjMessenger = angular.module('DjMessenger', [
                 });
         }
 
+
+        $scope.submitRegisterForm = function() {
+            if (!$scope.registerForm.username.$valid) {
+                $scope.showAlert('Invalid username.');
+                return;
+            }
+            if (!$scope.registerForm.email.$valid) {
+                $scope.showAlert('Invalid email.');
+                return;
+            }
+            if (!$scope.registerForm.password.$valid) {
+                $scope.showAlert('Invalid password.');
+                return;
+            }
+            if ($scope.registerForm.password.$viewValue != $scope.registerForm.password_confirm.$viewValue) {
+                $scope.showAlert('Passwords does not equal.');
+                return;
+            }
+
+            if (!$scope.registerForm.rulesConfirm.$viewValue) {
+                $scope.showAlert('You should accept the rules.');
+                return;
+            }
+
+        }
 
     })
 

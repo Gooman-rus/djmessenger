@@ -1,7 +1,7 @@
 <div class="content">
   <div class="row">
     <div class="col-md-6">
-      <form class="form-horizontal" action="">
+      <form class="form-horizontal" name="registerForm" ng-show="logged_in == false">
         <fieldset>
           <div id="legend">
             <legend class="">Register</legend>
@@ -16,7 +16,8 @@
           <div class="control-group">
             <label class="control-label" for="username">Username</label>
             <div class="controls">
-              <input id="username" name="username" placeholder="" class="form-control input-lg" type="text">
+              <input id="username" name="username" placeholder="" class="form-control input-lg" type="text"
+                     ng-model="username" ng-minlength="3" required />
               <p class="help-block">Username can contain any letters or numbers, without spaces</p>
             </div>
           </div>
@@ -24,7 +25,8 @@
           <div class="control-group">
             <label class="control-label" for="email">E-mail</label>
             <div class="controls">
-              <input id="email" name="email" placeholder="" class="form-control input-lg" type="email">
+              <input id="email" name="email" placeholder="" class="form-control input-lg" type="email"
+                     ng-model="email" ng-minlength="5" required />
               <p class="help-block">Please provide your E-mail</p>
             </div>
           </div>
@@ -32,7 +34,8 @@
           <div class="control-group">
             <label class="control-label" for="password">Password</label>
             <div class="controls">
-              <input id="password" name="password" placeholder="" class="form-control input-lg" type="password">
+              <input id="password" name="password" placeholder="" class="form-control input-lg" type="password"
+                     ng-model="password" ng-minlength="6" required />
               <p class="help-block">Password should be at least 6 characters</p>
             </div>
           </div>
@@ -40,18 +43,19 @@
           <div class="control-group">
             <label class="control-label" for="password_confirm">Password (Confirm)</label>
             <div class="controls">
-              <input id="password_confirm" name="password_confirm" placeholder="" class="form-control input-lg" type="password">
+              <input id="password_confirm" name="password_confirm" placeholder="" class="form-control input-lg" type="password"
+                     ng-model="password_confirm" ng-minlength="6" required />
               <p class="help-block">Please confirm password</p>
             </div>
           </div>
 
           <div class="control-group">
-            <input type="checkbox" class="check" /> I accept the rules
+            <input type="checkbox" class="check" name="rulesConfirm" ng-model="rulesConfirm" /> I accept the rules
           </div>
           <div class="control-group">
             <!-- Button -->
             <div class="controls">
-              <button class="btn btn-success">Register</button>
+              <button class="btn btn-success" ng-click="submitRegisterForm()">Register</button>
             </div>
           </div>
         </fieldset>
