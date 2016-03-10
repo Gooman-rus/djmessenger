@@ -1,7 +1,7 @@
 / App Module /
 var DjMessenger = angular.module('DjMessenger', [
         'ui.router',
-       // 'ui.bootstrap',
+        'ui.bootstrap',
     ])
 
     .config(['$stateProvider', '$urlRouterProvider',

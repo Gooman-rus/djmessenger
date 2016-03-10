@@ -11,11 +11,8 @@
                    <!-- <div data-ng-show="showError" ng-class="{fade:doFade}" class="alert alert-danger">
                         <strong>Error:</strong> {{errorMessage}}
                     </div>-->
-                    <div ng-if="showError == true" class="alert alert-danger alert-dismissible fade in" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"
-                                ng-click="closeAlert()">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                    <div uib-collapse="showError == false" class="alert alert-danger alert-dismissible fade in"
+                         role="alert">
                         <strong>Error:</strong> {{errorMessage}}
                     </div>
                     <div class="control-group">
