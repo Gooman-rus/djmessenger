@@ -43,6 +43,28 @@ var DjMessenger = angular.module('DjMessenger', [
                         controller: 'userCtrl', }
                 }
             })
+            .state('confirm_email', {
+                url: '/confirm-email/:activationKey',
+                cache: false,
+                data : { pageTitle: 'Email confirmation' },
+                   views: {
+                    nav: { templateUrl: 'static/partials/navbar.html' },
+                    content: {
+                        templateUrl: 'static/partials/email_confirm.html',
+                        controller: 'emailConfirmCtrl', }
+                }
+            })
+            .state('profile', {
+                url: '/profile/:loginParam',
+                cache: false,
+                data : { pageTitle: 'Profile' },
+                   views: {
+                    nav: { templateUrl: 'static/partials/navbar.html' },
+                    content: {
+                        templateUrl: 'static/partials/profile.html',
+                        controller: 'profileCtrl', }
+                }
+            })
             .state('test_api', {
                 url: '/test_api',
                 cache: false,
@@ -242,6 +264,81 @@ var DjMessenger = angular.module('DjMessenger', [
                     $scope.showAlert(eResponse.error.message);
                 });
         }
+
+    })
+
+
+    .controller('emailConfirmCtrl', function ($scope, $state, $stateParams, serverOp) {
+        $scope.checkLoggedIn = function() {
+            serverOp.get('user/logged_in/')
+                .success(function (check) {
+                    $scope.logged_in = check.logged_in;
+                    $scope.user_login = check.username;
+                    if ($scope.logged_in) {
+                        $state.go('home');
+                    }
+
+                    console.log('Logged in = ' + $scope.logged_in);
+                })
+                .error(function (error) {
+                    $scope.status = 'Error checking logged in: ' + error.message;
+                    console.log($scope.status);
+                });
+        }
+
+        $scope.checkLoggedIn();
+
+        if (!$stateParams.activationKey) {
+            $state.go('home');
+        }
+
+        serverOp.get('user/confirm_email/' + $stateParams.activationKey + '/')
+                .success(function (check) {
+                    if (check.success == true)
+                        $scope.successActivation = true;
+                    else {
+                        $scope.successActivation = false;
+                        if (check.reason == 'expired') {
+                            $scope.errorMessage = 'The activation period has been expired. Resend email link.';
+                        }
+                        if (check.reason == 'already activated') {
+                            $scope.errorMessage = 'Your have already activated your account. Now you can login.';
+                        }
+                    }
+
+                })
+                .error(function (error) {
+                    $scope.successActivation = false;
+                    $scope.errorMessage = 'Wrong activation link. Please contact with support.';
+                });
+
+    })
+
+    .controller('profileCtrl', function ($scope, $state, $stateParams, serverOp) {
+        //$scope.logged_in = false;
+        //$scope.user_login = '';
+        var test = '';
+        $scope.checkLoggedIn = function() {
+            serverOp.get('user/logged_in/')
+                .success(function (check) {
+                    $scope.logged_in = check.logged_in;
+                    $scope.user_login = check.username;
+                    var test = check.username;
+                    if (!$scope.logged_in) {
+                        $state.go('login');
+                    }
+                    return $scope.user_login;
+                })
+                .error(function (error) {
+                    $scope.status = 'Error checking logged in: ' + error.message;
+                    console.log($scope.status);
+                });
+
+        }
+        $scope.user_login = $scope.checkLoggedIn();
+        console.log(test);
+       // if ($stateParams.loginParam != )
+
 
     })
 

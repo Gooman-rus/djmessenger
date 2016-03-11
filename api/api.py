@@ -199,7 +199,7 @@ class CreateUserResource(ModelResource):
         email_subject = 'Account confirmation'
         email_body = "Hey %s, thanks for signing up. To activate your account, click this link within " \
                      "48 hours. " \
-                     "\n<a href=\"http://localhost:8000/api/v1/user/confirm_email/%s\">Confirmation link</a>"\
+                     "\n<a href=\"http://localhost:8000/#/confirm-email/%s\">Confirmation link</a>"\
                     % (username, activation_key)
         from_email = 'Dj-Messenger Support <djngmessenger@gmail.com>'
         msg = EmailMultiAlternatives(email_subject, email_body, from_email, [email])

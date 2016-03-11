@@ -37,7 +37,7 @@
                     <a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a>
                 </li>
                 <li ng-show="user_login.length > 0">
-                    <a>Hello, {{ user_login }}</a>
+                    <a href="#/profile/{{ user_login }}">{{ user_login }}</a>
                 </li>
                 <li ng-if="logged_in == true">
                     <a href="" ng-click="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
