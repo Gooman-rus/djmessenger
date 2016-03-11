@@ -1,3 +1,11 @@
+import hashlib
+import random
+
+import datetime
+
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from tastypie.authorization import DjangoAuthorization, Authorization
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.resources import ModelResource
@@ -8,6 +16,7 @@ from tastypie.http import HttpUnauthorized, HttpForbidden
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 
+from main_app.models import UserProfile
 from tastypie_extras.exceptions import CustomBadRequest
 
 
@@ -31,6 +40,9 @@ class UserResource(ModelResource):
             url(r'^(?P<resource_name>%s)/logged_in%s$' %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('logged_in'), name='api_logged_in'),
+            url(r'^(?P<resource_name>%s)/confirm_email%s(?P<activation_key>\w+)' %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('confirm_email'), name='api_confirm_email'),
         ]
 
     def login(self, request, **kwargs):
@@ -81,6 +93,31 @@ class UserResource(ModelResource):
                 'logged_in': False
             })
 
+    def confirm_email(self, request, **kwargs):
+        # check if there is UserProfile which matches the activation key (if not then display 404)
+        user_profile = get_object_or_404(UserProfile, activation_key=kwargs['activation_key'])
+
+        user = user_profile.user
+        if (user.is_active):
+            return self.create_response(request, {
+                    'success': False,
+                    'reason': 'already activated'
+                })
+
+        #check if the activation key has expired, if it hase then render confirm_expired.html
+        if user_profile.key_expires < timezone.now():
+            return self.create_response(request, {
+                'success': False,
+                'reason': 'expired',
+            })
+
+        user.is_active = True
+        user.save()
+
+        return self.create_response(request, {
+                'success': True,
+                'reason': 'activated'
+            })
 
 
 class CreateUserResource(ModelResource):
@@ -93,7 +130,6 @@ class CreateUserResource(ModelResource):
         authorization = Authorization()
         queryset = User.objects.all()
         resource_name = 'create_user'
-        always_return_data = True
 
 
     def hydrate(self, bundle):
@@ -140,8 +176,36 @@ class CreateUserResource(ModelResource):
                                               bundle.data['password'])
         bundle.obj.first_name = bundle.data['first_name']
         bundle.obj.last_name = bundle.data['last_name']
-        self.is_valid(bundle)
+        bundle.obj.is_active = False
 
+        self.is_valid(bundle)
         if bundle.errors:
             raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+
+        bundle.obj.save()
+
+        salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+        activation_key = hashlib.sha1(salt+email).hexdigest()
+        key_expires = datetime.datetime.today() + datetime.timedelta(2)
+
+        #Get user by username
+        user = User.objects.get(username=username)
+
+        # Create and save user profile
+        new_profile = UserProfile(user=user, activation_key=activation_key, key_expires=key_expires)
+        new_profile.save()
+
+        # Send email with activation key
+        email_subject = 'Account confirmation'
+        email_body = "Hey %s, thanks for signing up. To activate your account, click this link within " \
+                     "48 hours. " \
+                     "\n<a href=\"http://localhost:8000/api/v1/user/confirm_email/%s\">Confirmation link</a>"\
+                    % (username, activation_key)
+        from_email = 'Dj-Messenger Support <djngmessenger@gmail.com>'
+        msg = EmailMultiAlternatives(email_subject, email_body, from_email, [email])
+        msg.content_subtype = "html"
+        msg.send(fail_silently=False)
+        # send_mail(email_subject, email_body, 'djngmessenger@gmail.com',
+        #     [email], fail_silently=False)
+
         return bundle

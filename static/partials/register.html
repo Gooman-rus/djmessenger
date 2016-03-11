@@ -1,5 +1,5 @@
 <div class="content">
-  <div class="row">
+  <div class="row" ng-show="registerSuccess == false">
     <div class="col-md-6">
       <form class="form-horizontal" name="registerForm" ng-show="logged_in == false">
         <fieldset>
@@ -57,5 +57,12 @@
         </fieldset>
       </form>
     </div>
+  </div>
+  <div ng-show="registerSuccess == true">
+    <div class="page-header">
+      <h2>You have successfully registered!</h2>
+    </div>
+    <p>The email confirmation link has been sent to your email.</p>
+    <p>Please proceed the link to activate your account.</p>
   </div>
 </div>

@@ -18,7 +18,7 @@ from django.conf.urls import url, include
 from tastypie.api import Api
 from django.contrib import admin
 
-from accounts.views import MainView
+from main_app.views import MainView
 from api.api import UserResource, CreateUserResource
 
 v1_api = Api(api_name='v1')

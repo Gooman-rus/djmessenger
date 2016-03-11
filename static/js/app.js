@@ -140,6 +140,8 @@ var DjMessenger = angular.module('DjMessenger', [
     })
 
     .controller('userCtrl', function ($scope, $state, $timeout, serverOp) {
+        $scope.registerSuccess = false;
+
         $scope.checkLoggedIn = function() {
             serverOp.get('user/logged_in/')
                 .success(function (check) {
@@ -200,7 +202,6 @@ var DjMessenger = angular.module('DjMessenger', [
                 });
         }
 
-
         $scope.submitRegisterForm = function() {
             if (!$scope.registerForm.username.$valid) {
                 $scope.showAlert('Invalid username.');
@@ -218,12 +219,28 @@ var DjMessenger = angular.module('DjMessenger', [
                 $scope.showAlert('Passwords does not equal.');
                 return;
             }
-
             if (!$scope.registerForm.rulesConfirm.$viewValue) {
                 $scope.showAlert('You should accept the rules.');
                 return;
             }
 
+            var user_data = {
+                'username': $scope.username,
+                'password': $scope.password,
+                'email': $scope.email,
+                'first_name': 'N/A',
+                'last_name': 'N/A'
+            };
+            serverOp.post('create_user/', user_data)
+                .success(function (response) {
+                    $scope.registerForm.$setPristine();
+                    $scope.checkLoggedIn();
+                    $scope.registerSuccess = true;
+                })
+                .error(function (eResponse) {
+                    $scope.status = 'Unable to login: ' + eResponse;
+                    $scope.showAlert(eResponse.error.message);
+                });
         }
 
     })

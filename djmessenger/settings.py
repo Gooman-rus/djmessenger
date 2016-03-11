@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tastypie',
-    'accounts',
+    'main_app',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -127,3 +127,13 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     '/static/'
 ]
+
+
+#send_email settings
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'djngmessenger@gmail.com'
+EMAIL_HOST_PASSWORD = '759Ivan#Stakan'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+#DEFAULT_FROM_EMAIL = 'Dj-Messenger Support <djngmessenger@gmail.com>'
+DEFAULT_FROM_EMAIL = 'djngmessenger@gmail.com'
