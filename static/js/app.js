@@ -347,19 +347,6 @@ var DjMessenger = angular.module('DjMessenger', [
 
         }
         $scope.checkLoggedIn();
-
-
-        serverOp.get('user/' + $scope.user_login)
-                .success(function (data) {
-
-                })
-                .error(function (error) {
-                    $scope.status = 'Unable to GET data: ' + error.message;
-                    console.log($scope.status);
-                });
-
-
-
     })
 
     .controller('testApiCtrl', function ($scope, $state, serverOp) {
@@ -371,7 +358,7 @@ var DjMessenger = angular.module('DjMessenger', [
 //                    $scope.status = 'Unable to GET data: ' + error;
 //                    console.log($scope.status);
 //                });
-        serverOp.get('create_user/?user__id=1')
+        serverOp.get('user/')
                 .success(function (data) {
                     console.log(data);
                 })

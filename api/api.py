@@ -21,7 +21,6 @@ from tastypie.utils import trailing_slash
 from main_app.models import UserProfile
 from tastypie_extras.exceptions import CustomBadRequest
 
-
 class UserResource(ModelResource):
     class Meta:
         queryset = User.objects.all()
