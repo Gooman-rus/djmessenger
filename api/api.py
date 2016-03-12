@@ -6,7 +6,9 @@ import datetime
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from tastypie import fields
 from tastypie.authorization import DjangoAuthorization, Authorization
+from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.resources import ModelResource
 from django.contrib.auth.models import User
@@ -23,11 +25,19 @@ from tastypie_extras.exceptions import CustomBadRequest
 class UserResource(ModelResource):
     class Meta:
         queryset = User.objects.all()
-        fields = ['first_name']
+        fields = ['first_name', 'last_name', 'email', 'date_joined']
         allowed_methods = ['get', 'post']
         resource_name = 'user'
         authentication = SessionAuthentication()
         authorization = DjangoAuthorization()
+        detail_uri_name = 'username'
+
+
+    def obj_create(self, bundle, **kwargs):
+        return super(UserResource, self).obj_create(bundle, user=bundle.request.user)
+
+    def authorized_read_list(self, object_list, bundle):
+        return object_list.filter(user=bundle.request.user)
 
     def prepend_urls(self):
         return [
@@ -43,6 +53,8 @@ class UserResource(ModelResource):
             url(r'^(?P<resource_name>%s)/confirm_email%s(?P<activation_key>\w+)' %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('confirm_email'), name='api_confirm_email'),
+            url(r"^(?P<resource_name>%s)/(?P<username>[\w\d_.-]+)/$"
+                % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
     def login(self, request, **kwargs):
@@ -119,9 +131,9 @@ class UserResource(ModelResource):
                 'reason': 'activated'
             })
 
-
 class CreateUserResource(ModelResource):
     #user = fields.ForeignKey('core.api.UserResource', 'user', full=True)
+
 
     class Meta:
         allowed_methods = ['post']
@@ -192,7 +204,8 @@ class CreateUserResource(ModelResource):
         user = User.objects.get(username=username)
 
         # Create and save user profile
-        new_profile = UserProfile(user=user, activation_key=activation_key, key_expires=key_expires)
+        new_profile = UserProfile(user=user, activation_key=activation_key, key_expires=key_expires,
+                                  avatar=hashlib.md5(email.lower()).hexdigest())
         new_profile.save()
 
         # Send email with activation key

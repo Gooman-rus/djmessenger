@@ -55,7 +55,7 @@ var DjMessenger = angular.module('DjMessenger', [
                 }
             })
             .state('profile', {
-                url: '/profile/:loginParam',
+                url: '/profile',
                 cache: false,
                 data : { pageTitle: 'Profile' },
                    views: {
@@ -260,8 +260,13 @@ var DjMessenger = angular.module('DjMessenger', [
                     $scope.registerSuccess = true;
                 })
                 .error(function (eResponse) {
-                    $scope.status = 'Unable to login: ' + eResponse;
-                    $scope.showAlert(eResponse.error.message);
+                    $scope.status = 'Unable to register: ' + eResponse;
+                    if (eResponse.error)
+                        $scope.showAlert(eResponse.error.message);
+                    else {
+                        $scope.showAlert('Internal server error');
+                        console.log(eResponse.error_message);
+                    }
                 });
         }
 
@@ -314,20 +319,26 @@ var DjMessenger = angular.module('DjMessenger', [
 
     })
 
-    .controller('profileCtrl', function ($scope, $state, $stateParams, serverOp) {
-        //$scope.logged_in = false;
-        //$scope.user_login = '';
-        var test = '';
+    .controller('profileCtrl', function ($scope, $state, serverOp) {
         $scope.checkLoggedIn = function() {
             serverOp.get('user/logged_in/')
                 .success(function (check) {
                     $scope.logged_in = check.logged_in;
                     $scope.user_login = check.username;
-                    var test = check.username;
                     if (!$scope.logged_in) {
                         $state.go('login');
                     }
-                    return $scope.user_login;
+                    serverOp.get('user/' + $scope.user_login)
+                        .success(function (data) {
+                            $scope.user_fname = data.first_name;
+                            $scope.user_lname = data.last_name;
+                            $scope.user_email = data.email;
+                            $scope.user_joined = data.date_joined;
+                        })
+                        .error(function (error) {
+                        $scope.status = 'Unable to GET data: ' + error.message;
+                        console.log($scope.status);
+                        });
                 })
                 .error(function (error) {
                     $scope.status = 'Error checking logged in: ' + error.message;
@@ -335,23 +346,32 @@ var DjMessenger = angular.module('DjMessenger', [
                 });
 
         }
-        $scope.user_login = $scope.checkLoggedIn();
-        console.log(test);
-       // if ($stateParams.loginParam != )
+        $scope.checkLoggedIn();
 
 
-    })
-
-    .controller('testApiCtrl', function ($scope, $state, serverOp) {
-        serverOp.get('user/2/')
+        serverOp.get('user/' + $scope.user_login)
                 .success(function (data) {
-                    console.log(data);
+
                 })
                 .error(function (error) {
                     $scope.status = 'Unable to GET data: ' + error.message;
                     console.log($scope.status);
                 });
-        serverOp.get('user/')
+
+
+
+    })
+
+    .controller('testApiCtrl', function ($scope, $state, serverOp) {
+//        serverOp.get('user/1/')
+//                .success(function (data) {
+//                    console.log(data);
+//                })
+//                .error(function (error) {
+//                    $scope.status = 'Unable to GET data: ' + error;
+//                    console.log($scope.status);
+//                });
+        serverOp.get('create_user/?user__id=1')
                 .success(function (data) {
                     console.log(data);
                 })
