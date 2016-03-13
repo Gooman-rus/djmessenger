@@ -21,10 +21,22 @@ from tastypie.utils import trailing_slash
 from main_app.models import UserProfile
 from tastypie_extras.exceptions import CustomBadRequest
 
+class UserProfileResource(ModelResource):
+    #user = fields.ToOneField('api.api.UserResource', attribute='user', related_name='profile')
+    class Meta:
+        queryset = UserProfile.objects.all()
+        resource_name = 'profile'
+        allowed_methods = ['get']
+
+
 class UserResource(ModelResource):
+    #newsbodies = fields.ToManyField('yourapp.api.resources.NewsBodyResource', 'articlebody_set', full=True)
+    profile = fields.ToOneField('api.api.UserProfileResource',
+                                'profile', full=True, null=True)
     class Meta:
         queryset = User.objects.all()
-        fields = ['first_name', 'last_name', 'email', 'date_joined']
+        #fields = ['first_name', 'last_name', 'email', 'date_joined', 'profile']
+        fields = [ 'profile' ]
         allowed_methods = ['get', 'post']
         resource_name = 'user'
         authentication = SessionAuthentication()
@@ -130,9 +142,11 @@ class UserResource(ModelResource):
                 'reason': 'activated'
             })
 
+
+
+
 class CreateUserResource(ModelResource):
     #user = fields.ForeignKey('core.api.UserResource', 'user', full=True)
-
 
     class Meta:
         allowed_methods = ['post']

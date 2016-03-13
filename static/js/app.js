@@ -358,14 +358,16 @@ var DjMessenger = angular.module('DjMessenger', [
 //                    $scope.status = 'Unable to GET data: ' + error;
 //                    console.log($scope.status);
 //                });
-        serverOp.get('user/')
+        serverOp.get('user/yura')
                 .success(function (data) {
                     console.log(data);
                 })
                 .error(function (error) {
-                    $scope.status = 'Unable to GET data: ' + error.message;
-                    console.log($scope.status);
+                    $scope.status = 'Unable to GET data: ' + error;
+                    console.log(error);
                 });
+
+
 
 
     })
