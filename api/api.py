@@ -1,14 +1,12 @@
 import hashlib
 import random
-
 import datetime
 
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from tastypie import fields
 from tastypie.authorization import DjangoAuthorization, Authorization
-from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.resources import ModelResource
 from django.contrib.auth.models import User
@@ -22,27 +20,29 @@ from main_app.models import UserProfile
 from tastypie_extras.exceptions import CustomBadRequest
 
 class UserProfileResource(ModelResource):
+    #avatar = fields.CharField(attribute='avatar')
     #user = fields.ToOneField('api.api.UserResource', attribute='user', related_name='profile')
+
     class Meta:
         queryset = UserProfile.objects.all()
         resource_name = 'profile'
-        allowed_methods = ['get']
+        allowed_methods = ['get', 'post']
 
 
 class UserResource(ModelResource):
-    #newsbodies = fields.ToManyField('yourapp.api.resources.NewsBodyResource', 'articlebody_set', full=True)
-    profile = fields.ToOneField('api.api.UserProfileResource',
-                                'profile', full=True, null=True)
+    #profile = fields.ToOneField(UserProfileResource, 'profile', related_name='user', full=True, null=True)
+    profile = fields.ToOneField(UserProfileResource, 'profile', full=True, null=True)
+
     class Meta:
         queryset = User.objects.all()
         #fields = ['first_name', 'last_name', 'email', 'date_joined', 'profile']
-        fields = [ 'profile' ]
+        fields = ['profile']
         allowed_methods = ['get', 'post']
         resource_name = 'user'
+        detail_uri_name = 'username'
         authentication = SessionAuthentication()
         authorization = DjangoAuthorization()
-        detail_uri_name = 'username'
-
+        #include_resource_uri = False
 
     def obj_create(self, bundle, **kwargs):
         return super(UserResource, self).obj_create(bundle, user=bundle.request.user)

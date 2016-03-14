@@ -19,11 +19,12 @@ from tastypie.api import Api
 from django.contrib import admin
 
 from main_app.views import MainView
-from api.api import UserResource, CreateUserResource
+from api.api import UserResource, CreateUserResource, UserProfileResource
 
 v1_api = Api(api_name='v1')
 v1_api.register(UserResource())
 v1_api.register(CreateUserResource())
+v1_api.register(UserProfileResource())
 
 
 urlpatterns = [

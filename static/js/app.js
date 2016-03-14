@@ -274,6 +274,11 @@ var DjMessenger = angular.module('DjMessenger', [
 
 
     .controller('emailConfirmCtrl', function ($scope, $state, $stateParams, serverOp) {
+        if (!$stateParams.activationKey) {
+            $state.go('home');
+            return
+        }
+
         $scope.checkLoggedIn = function() {
             serverOp.get('user/logged_in/')
                 .success(function (check) {
@@ -293,9 +298,7 @@ var DjMessenger = angular.module('DjMessenger', [
 
         $scope.checkLoggedIn();
 
-        if (!$stateParams.activationKey) {
-            $state.go('home');
-        }
+
 
         serverOp.get('user/confirm_email/' + $stateParams.activationKey + '/')
                 .success(function (check) {
