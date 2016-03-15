@@ -20,29 +20,42 @@ from main_app.models import UserProfile
 from tastypie_extras.exceptions import CustomBadRequest
 
 class UserProfileResource(ModelResource):
-    #avatar = fields.CharField(attribute='avatar')
-    #user = fields.ToOneField('api.api.UserResource', attribute='user', related_name='profile')
 
     class Meta:
         queryset = UserProfile.objects.all()
+        authentication = SessionAuthentication()
+        authorization = DjangoAuthorization()
+        allowed_methods = ['get']
         resource_name = 'profile'
-        allowed_methods = ['get', 'post']
+        excludes = ['id']
+        #detail_uri_name = 'username'
+        include_resource_uri = False
+
+    # def obj_create(self, bundle, **kwargs):
+    #     return super(UserResource, self).obj_create(bundle, user=bundle.request.user)
+    #
+    # def authorized_read_list(self, object_list, bundle):
+    #     return object_list.filter(user=bundle.request.user)
+    #
+    # def prepend_urls(self):
+    #     return [
+    #         url(r"^(?P<resource_name>%s)/(?P<username>[\w\d_.-]+)/$"
+    #             % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
+    #     ]
 
 
 class UserResource(ModelResource):
-    #profile = fields.ToOneField(UserProfileResource, 'profile', related_name='user', full=True, null=True)
-    profile = fields.ToOneField(UserProfileResource, 'profile', full=True, null=True)
+    userprofile = fields.ToOneField(UserProfileResource, 'userprofile', null=True, full=True)
 
     class Meta:
         queryset = User.objects.all()
-        #fields = ['first_name', 'last_name', 'email', 'date_joined', 'profile']
-        fields = ['profile']
+        fields = ['first_name', 'last_name', 'email', 'date_joined', 'last_login', 'userprofile']
         allowed_methods = ['get', 'post']
         resource_name = 'user'
         detail_uri_name = 'username'
         authentication = SessionAuthentication()
         authorization = DjangoAuthorization()
-        #include_resource_uri = False
+        include_resource_uri = False
 
     def obj_create(self, bundle, **kwargs):
         return super(UserResource, self).obj_create(bundle, user=bundle.request.user)

@@ -1,45 +1,88 @@
-<div class="row">
+<div class="row" ng-show="wrongUserProfile == false">
     <div class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-12 lead">User profile<hr></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 text-center">
-                        <img class="img-circle avatar avatar-original" style="-webkit-user-select:none;
-              display:block; margin:auto;" src="http://robohash.org/sitsequiquia.png?size=120x120">
+                <div ng-show="showProfile == true">
+                    <div class="row">
+                        <div class="col-md-12 lead">User profile<hr></div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h1 class="only-bottom-margin">{{ user_login }}</h1>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img ng-src="http://www.gravatar.com/avatar/{{user_hash}}" alt="Avatar"
+                                 style="-webkit-user-select:none;display:block; margin:auto;"
+                                 data-toggle="tooltip" data-placement="bottom" title="Avatar (Gravatar)"/>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <span class="text-muted">Fisrt name:</span> {{ user_fname }}<br>
-                                <span class="text-muted">Last name:</span> {{ user_lname }}<br>
-                                <span class="text-muted">Email:</span> {{ user_email }}<br>
-                                <span class="text-muted">Birth date:</span> 01.01.2001<br>
-                                <span class="text-muted">Gender:</span> male<br><br>
-                                <small class="text-muted">Created: {{ user_joined }}</small>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="activity-mini">
-                                    <i class="glyphicon glyphicon-comment text-muted"></i> 500
-                                </div>
-                                <div class="activity-mini">
-                                    <i class="glyphicon glyphicon-thumbs-up text-muted"></i> 1500
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h1 class="only-bottom-margin">{{ user_login }}</h1>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <span class="text-muted">Fisrt name:</span> {{ user_fname }}<br>
+                                    <span class="text-muted">Last name:</span> {{ user_lname }}<br>
+                                    <span class="text-muted">Email:</span> {{ user_email }}<br>
+                                    <!--<span class="text-muted">Birth date:</span> 01.01.2001<br>
+                                    <span class="text-muted">Gender:</span> male<br><br>-->
+                                    <small class="text-muted">Last login: {{ last_login }}</small>
+                                </div>
+                                <!--<div class="col-md-6">
+                                    <div class="activity-mini">
+                                        <i class="glyphicon glyphicon-comment text-muted"></i> 500
+                                    </div>
+                                    <div class="activity-mini">
+                                        <i class="glyphicon glyphicon-thumbs-up text-muted"></i> 1500
+                                    </div>
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <hr>
+                            <button class="btn btn-default pull-right" ng-click="editProfile()"
+                                    ng-show="currentUser == true">
+                                <i class="glyphicon glyphicon-pencil"></i> Edit
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <hr><button class="btn btn-default pull-right"><i class="glyphicon glyphicon-pencil"></i> Edit</button>
+
+                <div ng-show="showProfile == false">
+                    <!-- edit form column -->
+
+                    <div class="row">
+                        <div class="col-md-12 lead">Edit profile ({{ user_login }})<hr></div>
                     </div>
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">First name:</label>
+                            <div class="col-lg-8">
+                                <input class="form-control" ng-model="user_fname" value="{{user_fname}}" type="text" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">Last name:</label>
+                            <div class="col-lg-8">
+                                <input class="form-control" ng-model="user_lname" value="{{user_lname}}" type="text" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">Email:</label>
+                            <div class="col-lg-8">
+                                <input class="form-control" ng-model="user_email" value="{{user_email}}" type="text" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-8">
+                                <input class="btn btn-primary" value="Save Changes" type="button">
+                                <span></span>
+                                <input class="btn btn-default" value="Cancel" type="reset" ng-click="showProfile = true">
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

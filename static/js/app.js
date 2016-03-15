@@ -55,7 +55,7 @@ var DjMessenger = angular.module('DjMessenger', [
                 }
             })
             .state('profile', {
-                url: '/profile',
+                url: '/profile/:userProfile',
                 cache: false,
                 data : { pageTitle: 'Profile' },
                    views: {
@@ -125,7 +125,7 @@ var DjMessenger = angular.module('DjMessenger', [
         }
     ])
 
-    .controller('navbarCtrl', function ($scope, $location, serverOp) {
+    .controller('navbarCtrl', function ($scope, $state, $location, serverOp) {
         // navbar active link
         $scope.isActive = function (viewLocation) {
             return viewLocation === $location.path();
@@ -150,10 +150,13 @@ var DjMessenger = angular.module('DjMessenger', [
             serverOp.get('user/logout/')
                 .success(function (data) {
                     $scope.checkLoggedIn();
-                    console.log('logged out');
+                    if ($state.current.name == 'profile')
+                        $state.go('home');
+
+                    //console.log('logged out');
                 })
                 .error(function (error) {
-                    $scope.status = 'Unable to logout: ' + error.message;
+                    $scope.status = 'Unable to logout: ' + error;
                     console.log($scope.status);
                 });
         }
@@ -322,7 +325,10 @@ var DjMessenger = angular.module('DjMessenger', [
 
     })
 
-    .controller('profileCtrl', function ($scope, $state, serverOp) {
+    .controller('profileCtrl', function ($scope, $state, $stateParams, serverOp) {
+        $scope.wrongUserProfile = true;
+        $scope.currentUser = true;
+
         $scope.checkLoggedIn = function() {
             serverOp.get('user/logged_in/')
                 .success(function (check) {
@@ -331,16 +337,24 @@ var DjMessenger = angular.module('DjMessenger', [
                     if (!$scope.logged_in) {
                         $state.go('login');
                     }
+                    if ($stateParams.userProfile) {
+                        $scope.user_login = $stateParams.userProfile;
+                        $scope.currentUser = false;
+                    }
                     serverOp.get('user/' + $scope.user_login)
                         .success(function (data) {
+                            $scope.wrongUserProfile = false;
                             $scope.user_fname = data.first_name;
                             $scope.user_lname = data.last_name;
                             $scope.user_email = data.email;
-                            $scope.user_joined = data.date_joined;
+                            //$scope.user_joined = data.date_joined;
+                            $scope.last_login = data.last_login;
+                            $scope.user_hash = data.userprofile.avatar;
                         })
                         .error(function (error) {
-                        $scope.status = 'Unable to GET data: ' + error.message;
-                        console.log($scope.status);
+                            $scope.status = 'Unable to GET data: ' + error;
+                            console.log($scope.status);
+                            $state.go('home');
                         });
                 })
                 .error(function (error) {
@@ -350,6 +364,14 @@ var DjMessenger = angular.module('DjMessenger', [
 
         }
         $scope.checkLoggedIn();
+
+        $scope.showProfile = true;
+
+        $scope.editProfile = function() {
+            $scope.showProfile = false;
+        }
+
+
     })
 
     .controller('testApiCtrl', function ($scope, $state, serverOp) {
