@@ -28,7 +28,7 @@ var DjMessenger = angular.module('DjMessenger', [
                     nav: { templateUrl: 'static/partials/navbar.html' },
                     content: {
                         templateUrl: 'static/partials/login.html',
-                        controller: 'userCtrl',
+                        controller: 'UserCtrl',
                     }
                 }
             })
@@ -40,7 +40,7 @@ var DjMessenger = angular.module('DjMessenger', [
                     nav: { templateUrl: 'static/partials/navbar.html' },
                     content: {
                         templateUrl: 'static/partials/register.html',
-                        controller: 'userCtrl', }
+                        controller: 'UserCtrl', }
                 }
             })
             .state('confirm_email', {
@@ -125,46 +125,44 @@ var DjMessenger = angular.module('DjMessenger', [
         }
     ])
 
-    .controller('navbarCtrl', function ($scope, $state, $location, serverOp) {
-        // navbar active link
-        $scope.isActive = function (viewLocation) {
-            return viewLocation === $location.path();
-        };
+//    .controller('NavbarCtrl', function ($scope, $state, $location, serverOp) {
+//        // navbar active link
+//        $scope.isActive = function (viewLocation) {
+//            return viewLocation === $location.path();
+//        };
+//
+//        $scope.checkLoggedIn = function() {
+//            serverOp.get('user/logged_in/')
+//                .success(function (check) {
+//                    $scope.logged_in = check.logged_in;
+//                    $scope.user_login = check.username;
+//                    console.log('Logged in = ' + $scope.logged_in);
+//                })
+//                .error(function (error) {
+//                    $scope.status = 'Error checking logged in: ' + error;
+//                    console.log($scope.status);
+//                });
+//        }
+//
+//        $scope.checkLoggedIn();
+//
+//        $scope.logout = function() {
+//            serverOp.get('user/logout/')
+//                .success(function (data) {
+//                    $scope.checkLoggedIn();
+//                    if ($state.current.name == 'profile')
+//                        $state.go('home');
+//
+//                    //console.log('logged out');
+//                })
+//                .error(function (error) {
+//                    $scope.status = 'Unable to logout: ' + error;
+//                    console.log($scope.status);
+//                });
+//        }
+//    })
 
-        $scope.checkLoggedIn = function() {
-            serverOp.get('user/logged_in/')
-                .success(function (check) {
-                    $scope.logged_in = check.logged_in;
-                    $scope.user_login = check.username;
-                    console.log('Logged in = ' + $scope.logged_in);
-                })
-                .error(function (error) {
-                    $scope.status = 'Error checking logged in: ' + error;
-                    console.log($scope.status);
-                });
-        }
-
-        $scope.checkLoggedIn();
-
-        $scope.logout = function() {
-            serverOp.get('user/logout/')
-                .success(function (data) {
-                    $scope.checkLoggedIn();
-                    if ($state.current.name == 'profile')
-                        $state.go('home');
-
-                    //console.log('logged out');
-                })
-                .error(function (error) {
-                    $scope.status = 'Unable to logout: ' + error;
-                    console.log($scope.status);
-                });
-        }
-
-
-    })
-
-    .controller('userCtrl', function ($scope, $state, $timeout, serverOp) {
+    .controller('UserCtrl', function ($scope, $state, $timeout, serverOp) {
         $scope.registerSuccess = false;
 
         $scope.checkLoggedIn = function() {
