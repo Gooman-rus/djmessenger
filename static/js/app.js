@@ -55,7 +55,8 @@ var DjMessenger = angular.module('DjMessenger', [
                     nav: { templateUrl: 'static/partials/navbar.html' },
                     content: {
                         templateUrl: 'static/partials/email_confirm.html',
-                        controller: 'EmailConfirmCtrl', }
+                        controller: 'EmailConfirmCtrl',
+                    }
                 }
             })
             .state('profile', {
@@ -66,7 +67,19 @@ var DjMessenger = angular.module('DjMessenger', [
                     nav: { templateUrl: 'static/partials/navbar.html' },
                     content: {
                         templateUrl: 'static/partials/profile.html',
-                        controller: 'ProfileCtrl', }
+                        controller: 'ProfileCtrl',
+                    }
+                }
+            })
+            .state('contacts', {
+                url: '/contacts',
+                cache: false,
+                data : { pageTitle: 'Contacts' },
+                   views: {
+                    nav: { templateUrl: 'static/partials/navbar.html' },
+                    content: {
+                        templateUrl: 'static/partials/contacts.html',
+                    }
                 }
             })
             .state('test_api', {
@@ -139,7 +152,18 @@ var DjMessenger = angular.module('DjMessenger', [
 //                    $scope.status = 'Unable to GET data: ' + error;
 //                    console.log($scope.status);
 //                });
-        serverOp.get('user/yura')
+//        serverOp.get('user/yura')
+//                .success(function (data) {
+//                    console.log(data);
+//                })
+//                .error(function (error) {
+//                    $scope.status = 'Unable to GET data: ' + error;
+//                    console.log(error);
+//                });
+
+
+        data = {'first_name': 'works123'};
+        serverOp.update('user/', 'Test', data)
                 .success(function (data) {
                     console.log(data);
                 })
@@ -148,7 +172,14 @@ var DjMessenger = angular.module('DjMessenger', [
                     console.log(error);
                 });
 
-
+        serverOp.get('user/Test')
+                .success(function (data) {
+                    console.log(data);
+                })
+                .error(function (error) {
+                    $scope.status = 'Unable to GET data: ' + error;
+                    console.log(error);
+                });
 
 
     })

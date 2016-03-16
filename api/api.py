@@ -1,6 +1,7 @@
 import hashlib
 import random
 import datetime
+import re
 
 from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
@@ -9,7 +10,7 @@ from tastypie import fields
 from tastypie.authorization import DjangoAuthorization, Authorization
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.resources import ModelResource
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from tastypie.authentication import SessionAuthentication, Authentication
 from django.contrib.auth import authenticate, login, logout
 from tastypie.http import HttpUnauthorized, HttpForbidden
@@ -28,20 +29,8 @@ class UserProfileResource(ModelResource):
         allowed_methods = ['get']
         resource_name = 'profile'
         excludes = ['id']
-        #detail_uri_name = 'username'
         include_resource_uri = False
 
-    # def obj_create(self, bundle, **kwargs):
-    #     return super(UserResource, self).obj_create(bundle, user=bundle.request.user)
-    #
-    # def authorized_read_list(self, object_list, bundle):
-    #     return object_list.filter(user=bundle.request.user)
-    #
-    # def prepend_urls(self):
-    #     return [
-    #         url(r"^(?P<resource_name>%s)/(?P<username>[\w\d_.-]+)/$"
-    #             % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
-    #     ]
 
 
 class UserResource(ModelResource):
@@ -50,12 +39,12 @@ class UserResource(ModelResource):
     class Meta:
         queryset = User.objects.all()
         fields = ['first_name', 'last_name', 'email', 'date_joined', 'last_login', 'userprofile']
-        allowed_methods = ['get', 'post']
+        allowed_methods = ['get', 'post', 'patch']
         resource_name = 'user'
         detail_uri_name = 'username'
         authentication = SessionAuthentication()
         authorization = DjangoAuthorization()
-        include_resource_uri = False
+        #include_resource_uri = False
 
     def obj_create(self, bundle, **kwargs):
         return super(UserResource, self).obj_create(bundle, user=bundle.request.user)
@@ -155,6 +144,39 @@ class UserResource(ModelResource):
                 'reason': 'activated'
             })
 
+    def obj_update(self, bundle, request, **kwargs):
+        #get authenticated user
+        curr_user = bundle.request.user
+
+        #get username to edit from URI
+        username_regex = re.compile("/(\w+)/$")
+        request_username = username_regex.findall(bundle.data['resource_uri'])[0]
+
+        #you can edit only your profile
+        if (str(curr_user) != request_username):
+            raise ImmediateHttpResponse(HttpForbidden())
+
+
+        # bundle.obj = User.objects.get(username=request_username)
+        # print bundle.obj
+
+        bundle = super(UserResource, self).obj_update(bundle, request)
+
+        bundle.obj.first_name = bundle.data['first_name']
+        bundle.obj.last_name = bundle.data['last_name']
+        bundle.obj.email = bundle.data['email']
+
+        self.is_valid(bundle)
+        if bundle.errors:
+            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+
+        bundle.obj.save()
+
+
+        return bundle
+
+
+
 
 
 
@@ -215,6 +237,9 @@ class CreateUserResource(ModelResource):
         bundle.obj.first_name = bundle.data['first_name']
         bundle.obj.last_name = bundle.data['last_name']
         bundle.obj.is_active = False
+
+        user_group = Group.objects.get(name='CommonUsers')
+        user_group.user_set.add(bundle.obj)
 
         self.is_valid(bundle)
         if bundle.errors:

@@ -1,7 +1,7 @@
 angular.module('DjMessenger.EmailConfirmCtrl', [
-        'ui.router',
-        'ui.bootstrap',
-    ])
+    'ui.router',
+    'ui.bootstrap',
+])
 
 .controller('EmailConfirmCtrl', function ($scope, $state, $stateParams, serverOp) {
     if (!$stateParams.activationKey) {
@@ -28,23 +28,23 @@ angular.module('DjMessenger.EmailConfirmCtrl', [
     $scope.checkLoggedIn();
 
     serverOp.get('user/confirm_email/' + $stateParams.activationKey + '/')
-            .success(function (check) {
-                if (check.success == true)
-                    $scope.successActivation = true;
-                else {
-                    $scope.successActivation = false;
-                    if (check.reason == 'expired') {
-                        $scope.errorMessage = 'The activation period has been expired. Resend email link.';
-                    }
-                    if (check.reason == 'already activated') {
-                        $scope.errorMessage = 'Your have already activated your account. Now you can login.';
-                    }
-                }
-
-            })
-            .error(function (error) {
+        .success(function (check) {
+            if (check.success == true)
+                $scope.successActivation = true;
+            else {
                 $scope.successActivation = false;
-                $scope.errorMessage = 'Wrong activation link. Please contact with support.';
-            });
+                if (check.reason == 'expired') {
+                    $scope.errorMessage = 'The activation period has been expired. Resend email link.';
+                }
+                if (check.reason == 'already activated') {
+                    $scope.errorMessage = 'Your have already activated your account. Now you can login.';
+                }
+            }
+
+        })
+        .error(function (error) {
+            $scope.successActivation = false;
+            $scope.errorMessage = 'Wrong activation link. Please contact with support.';
+        });
 
 })
