@@ -1,16 +1,17 @@
-<div ng-show="successActivation == true">
-    <div class="page-header">
-        <h2>Congratulations!</h2>
+<div ng-show="logged_in == false">
+    <div ng-show="successActivation == true">
+        <div class="page-header">
+            <h2>Congratulations!</h2>
+        </div>
+        <p>Your account has been successfuly activated via email.</p>
+        <p>Now you can <a href="#/login">login</a>.</p>
     </div>
-    <p>Your account has been successfuly activated via email.</p>
-    <p>Now you can <a href="#/login">login</a>.</p>
-</div>
 
-
-<div ng-show="successActivation == false">
-    <div class="page-header">
-        <h2>Oh, error!</h2>
+    <div ng-show="successActivation == false">
+        <div class="page-header">
+            <h2>Oh, error!</h2>
+        </div>
+        <p>Account activation error occurred.</p>
+        <p>{{ errorMessage }}</p>
     </div>
-    <p>Account activation error occurred.</p>
-    <p>{{ errorMessage }}</p>
 </div>
