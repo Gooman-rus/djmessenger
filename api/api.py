@@ -18,6 +18,7 @@ from django.conf.urls import url
 from tastypie.utils import trailing_slash
 
 from main_app.models import UserProfile
+from tastypie_extras.email import my_send_email, gen_activation_key
 from tastypie_extras.exceptions import CustomBadRequest
 
 class UserProfileResource(ModelResource):
@@ -125,9 +126,9 @@ class UserResource(ModelResource):
         user = user_profile.user
         if (user.is_active):
             return self.create_response(request, {
-                    'success': False,
-                    'reason': 'already activated'
-                })
+                'success': False,
+                'reason': 'already activated'
+            })
 
         #check if the activation key has expired, if it hase then render confirm_expired.html
         if user_profile.key_expires < timezone.now():
@@ -140,9 +141,9 @@ class UserResource(ModelResource):
         user.save()
 
         return self.create_response(request, {
-                'success': True,
-                'reason': 'activated'
-            })
+            'success': True,
+            'reason': 'activated'
+        })
 
     def obj_update(self, bundle, request, **kwargs):
         #get authenticated user
@@ -160,11 +161,34 @@ class UserResource(ModelResource):
         # bundle.obj = User.objects.get(username=request_username)
         # print bundle.obj
 
+        old_email = bundle.obj.email
+
         bundle = super(UserResource, self).obj_update(bundle, request)
 
         bundle.obj.first_name = bundle.data['first_name']
         bundle.obj.last_name = bundle.data['last_name']
-        bundle.obj.email = bundle.data['email']
+
+        # if (bundle.obj.email != bundle.data['email']):
+        #     print 'Email has been changed'
+
+        #has email been changed?
+        print old_email
+        print bundle.data['email']
+        if (old_email != bundle.data['email']) :
+            print "changed"
+            bundle.obj.is_active = False
+            print "is_active change"
+            activation_key, key_expires = gen_activation_key(bundle.data['email'])
+            print activation_key
+            print key_expires
+            bundle.obj.userprofile.activation_key = activation_key
+            print "activation_key"
+            bundle.obj.userprofile.key_expires = key_expires
+            print "key_expires"
+            print "sending"
+            my_send_email(bundle.data['email'], curr_user, activation_key, purpose='change')
+            print "sent"
+            bundle.obj.email = bundle.data['email']
 
         self.is_valid(bundle)
         if bundle.errors:
@@ -208,7 +232,7 @@ class CreateUserResource(ModelResource):
                 raise CustomBadRequest(
                     code="missing_key",
                     message="Must provide {missing_key} when creating a user."
-                            .format(missing_key=field))
+                        .format(missing_key=field))
         return bundle
 
     def obj_create(self, bundle, **kwargs):
@@ -227,7 +251,7 @@ class CreateUserResource(ModelResource):
             raise CustomBadRequest(
                 code="missing_key",
                 message="Must provide {missing_key} when creating a user."
-                        .format(missing_key=missing_key))
+                    .format(missing_key=missing_key))
         except User.DoesNotExist:
             pass
 
@@ -247,9 +271,11 @@ class CreateUserResource(ModelResource):
 
         bundle.obj.save()
 
-        salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-        activation_key = hashlib.sha1(salt+email).hexdigest()
-        key_expires = datetime.datetime.today() + datetime.timedelta(2)
+        # salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+        # activation_key = hashlib.sha1(salt+email).hexdigest()
+        # key_expires = datetime.datetime.today() + datetime.timedelta(2)
+
+        activation_key, key_expires = gen_activation_key(email)
 
         #Get user by username
         user = User.objects.get(username=username)
@@ -260,16 +286,7 @@ class CreateUserResource(ModelResource):
         new_profile.save()
 
         # Send email with activation key
-        email_subject = 'Account confirmation'
-        email_body = "Hey %s, thanks for signing up. To activate your account, click this link within " \
-                     "48 hours. " \
-                     "\n<a href=\"http://localhost:8000/#/confirm-email/%s\">Confirmation link</a>"\
-                    % (username, activation_key)
-        from_email = 'Dj-Messenger Support <djngmessenger@gmail.com>'
-        msg = EmailMultiAlternatives(email_subject, email_body, from_email, [email])
-        msg.content_subtype = "html"
-        msg.send(fail_silently=False)
-        # send_mail(email_subject, email_body, 'djngmessenger@gmail.com',
-        #     [email], fail_silently=False)
+        my_send_email(email, username, activation_key)
 
         return bundle
+

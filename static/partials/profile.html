@@ -6,6 +6,10 @@
                     <div class="row">
                         <div class="col-md-12 lead">User profile<hr></div>
                     </div>
+                    <div uib-collapse="showMessage == false" class="alert alert-info alert-dismissible fade in"
+                         role="alert">
+                        <strong>Info:</strong> {{infoMessage}}
+                    </div>
                     <div class="row">
                         <div class="col-md-4 text-center">
                             <img ng-src="http://www.gravatar.com/avatar/{{user_hash}}" alt="Avatar"
@@ -41,7 +45,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <hr>
-                            <button class="btn btn-default pull-right" ng-click="editProfile()"
+                            <button class="btn btn-default pull-right" ng-click="closeAlert(); editProfile();"
                                     ng-show="currentUser == true">
                                 <i class="glyphicon glyphicon-pencil"></i> Edit
                             </button>
@@ -53,17 +57,23 @@
                     <div class="row">
                         <div class="col-md-12 lead">Edit profile ({{ user_login }})<hr></div>
                     </div>
+                    <div uib-collapse="showMessage == false" class="alert alert-danger alert-dismissible fade in"
+                         role="alert">
+                        <strong>Error:</strong> {{infoMessage}}
+                    </div>
                     <form class="form-horizontal" role="form" name="editProfileForm">
                         <div class="form-group">
                             <label class="col-lg-3 control-label">First name:</label>
                             <div class="col-lg-8">
-                                <input class="form-control" ng-model="user_fname" value="{{user_fname}}" type="text" />
+                                <input class="form-control" ng-model="user_fname" value="{{user_fname}}"
+                                       ng-pattern="namePattern" name="user_fname" type="text" />
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-lg-3 control-label">Last name:</label>
                             <div class="col-lg-8">
-                                <input class="form-control" ng-model="user_lname" value="{{user_lname}}" type="text" />
+                                <input class="form-control" ng-model="user_lname" value="{{user_lname}}"
+                                       ng-pattern="namePattern" name="user_lname" type="text" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -78,7 +88,8 @@
                                 <input class="btn btn-primary" value="Save Changes" type="button"
                                        ng-click="changeProfile()">
                                 <span></span>
-                                <input class="btn btn-default" value="Cancel" type="reset" ng-click="showProfile = true">
+                                <input class="btn btn-default" value="Cancel" type="reset"
+                                       ng-click="closeAlert(); showProfile = true;">
                             </div>
                         </div>
                     </form>
