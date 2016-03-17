@@ -7,6 +7,7 @@ angular.module('DjMessenger.ProfileCtrl', [
     $scope.wrongUserProfile = true;
     $scope.currentUser = true;
     $scope.showProfile = true;
+    $scope.dataLoaded = true;
     $scope.namePattern = "([a-zA-Z ,.'-]{2,30}\s*)+";
 
     $scope.editProfile = function() {
@@ -47,7 +48,7 @@ angular.module('DjMessenger.ProfileCtrl', [
                         $scope.user_lname = data.last_name;
                         $scope.user_email = data.email;
                         //$scope.user_joined = data.date_joined;
-                        $scope.last_login = $filter('date')(data.last_login, 'dd MMM hh:mm', '+0600');
+                        $scope.last_login = $filter('date')(data.last_login, 'dd MMM HH:mm', '+0600');
                         $scope.user_hash = data.userprofile.avatar;
                     })
                     .error(function (error) {
@@ -56,7 +57,9 @@ angular.module('DjMessenger.ProfileCtrl', [
                         $state.go('home');
                     });
 
-                $scope.changeProfile = function() {
+                $scope.emailChanged = false;
+
+                $scope.changeProfile = function(emailChanged) {
 
                     var dataToChange = {
                         'first_name': $scope.user_fname,
@@ -76,16 +79,31 @@ angular.module('DjMessenger.ProfileCtrl', [
                         return;
                     }
 
+                    $scope.dataLoaded = false;
                     serverOp.update('user/', $scope.user_login, dataToChange)
                         .success(function (data) {
                             console.log(data);
+                            $scope.dataLoaded = true;
                             $scope.showAlert('Your profile has been changed successfully.');
+
+
+                            serverOp.get('user/logout/')
+                                .success(function (data) {
+                                    $scope.successEmailChange = true;
+                                    $scope.showProfile = false;
+
+                                })
+                                .error(function (error) {
+                                    $scope.status = 'Unable to logout: ' + error;
+                                    console.log($scope.status);
+                                });
                         })
                         .error(function (error) {
-                            $scope.status = 'Unable to GET data: ' + error;
+                            $scope.status = 'UPDATE error: ' + error;
                             console.log(error);
                         });
 
+                    $scope.emailChanged = false;
                     $scope.showProfile = true;
                 }
             })

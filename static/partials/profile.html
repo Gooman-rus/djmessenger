@@ -2,7 +2,20 @@
     <div class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-body">
-                <div ng-show="showProfile == true">
+                <p class="text-center" ng-show="dataLoaded == false">
+                    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+                </p>
+
+                <div ng-show="successEmailChange == true">
+                    <div class="row">
+                        <div class="col-md-12 lead">Email has been changed<hr></div>
+                        <p>You need to confirm your email now.</p>
+                    </div>
+
+
+                </div>
+
+                <div ng-show="showProfile && dataLoaded">
                     <div class="row">
                         <div class="col-md-12 lead">User profile<hr></div>
                     </div>
@@ -10,6 +23,7 @@
                          role="alert">
                         <strong>Info:</strong> {{infoMessage}}
                     </div>
+
                     <div class="row">
                         <div class="col-md-4 text-center">
                             <img ng-src="http://www.gravatar.com/avatar/{{user_hash}}" alt="Avatar"
@@ -53,7 +67,7 @@
                     </div>
                 </div>
 
-                <div ng-show="showProfile == false">
+                <div ng-show="showProfile == false && successEmailChange == false">
                     <div class="row">
                         <div class="col-md-12 lead">Edit profile ({{ user_login }})<hr></div>
                     </div>
@@ -79,14 +93,15 @@
                         <div class="form-group">
                             <label class="col-lg-3 control-label">Email:</label>
                             <div class="col-lg-8">
-                                <input class="form-control" ng-model="user_email" value="{{user_email}}" type="text" />
+                                <input class="form-control" ng-model="user_email" value="{{user_email}}"
+                                       ng-change="emailChanged = true" type="text" />
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-md-3 control-label"></label>
                             <div class="col-md-8">
                                 <input class="btn btn-primary" value="Save Changes" type="button"
-                                       ng-click="changeProfile()">
+                                       ng-click="changeProfile(emailChanged)">
                                 <span></span>
                                 <input class="btn btn-default" value="Cancel" type="reset"
                                        ng-click="closeAlert(); showProfile = true;">

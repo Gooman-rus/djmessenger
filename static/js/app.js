@@ -71,6 +71,18 @@ var DjMessenger = angular.module('DjMessenger', [
                     }
                 }
             })
+            .state('info', {
+                url: '/info',
+                cache: false,
+                data : { pageTitle: 'Information' },
+                   views: {
+                    nav: { templateUrl: 'static/partials/navbar.html' },
+                    content: {
+                        templateUrl: 'static/partials/info.html',
+                        controller: 'ProfileCtrl',
+                    }
+                }
+            })
             .state('contacts', {
                 url: '/contacts',
                 cache: false,
@@ -82,6 +94,8 @@ var DjMessenger = angular.module('DjMessenger', [
                     }
                 }
             })
+
+
             .state('test_api', {
                 url: '/test_api',
                 cache: false,

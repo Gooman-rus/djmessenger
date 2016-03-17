@@ -1,9 +1,6 @@
 import hashlib
-import random
-import datetime
 import re
 
-from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from tastypie import fields
@@ -147,7 +144,8 @@ class UserResource(ModelResource):
 
     def obj_update(self, bundle, request, **kwargs):
         #get authenticated user
-        curr_user = bundle.request.user
+        #curr_user = bundle.request.user
+        curr_user = request.user
 
         #get username to edit from URI
         username_regex = re.compile("/(\w+)/$")
@@ -157,10 +155,6 @@ class UserResource(ModelResource):
         if (str(curr_user) != request_username):
             raise ImmediateHttpResponse(HttpForbidden())
 
-
-        # bundle.obj = User.objects.get(username=request_username)
-        # print bundle.obj
-
         old_email = bundle.obj.email
 
         bundle = super(UserResource, self).obj_update(bundle, request)
@@ -168,44 +162,36 @@ class UserResource(ModelResource):
         bundle.obj.first_name = bundle.data['first_name']
         bundle.obj.last_name = bundle.data['last_name']
 
-        # if (bundle.obj.email != bundle.data['email']):
-        #     print 'Email has been changed'
-
         #has email been changed?
         print old_email
         print bundle.data['email']
-        if (old_email != bundle.data['email']) :
-            print "changed"
+        print bundle.obj.userprofile.activation_key
+        #need_to_logout = False
+        if old_email != bundle.data['email']:
             bundle.obj.is_active = False
-            print "is_active change"
             activation_key, key_expires = gen_activation_key(bundle.data['email'])
-            print activation_key
-            print key_expires
             bundle.obj.userprofile.activation_key = activation_key
-            print "activation_key"
             bundle.obj.userprofile.key_expires = key_expires
-            print "key_expires"
-            print "sending"
             my_send_email(bundle.data['email'], curr_user, activation_key, purpose='change')
-            print "sent"
             bundle.obj.email = bundle.data['email']
+            #need_to_logout = True
 
         self.is_valid(bundle)
         if bundle.errors:
             raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
 
+        bundle.obj.userprofile.save()
         bundle.obj.save()
 
+        # if need_to_logout and request.user and request.user.is_authenticated():
+        #     logout(request)
 
         return bundle
 
 
 
 
-
-
 class CreateUserResource(ModelResource):
-    #user = fields.ForeignKey('core.api.UserResource', 'user', full=True)
 
     class Meta:
         allowed_methods = ['post']
@@ -217,14 +203,6 @@ class CreateUserResource(ModelResource):
 
 
     def hydrate(self, bundle):
-        # REQUIRED_USER_PROFILE_FIELDS = ("user")
-        # for field in REQUIRED_USER_PROFILE_FIELDS:
-        #     if field not in bundle.data:
-        #         raise CustomBadRequest(
-        #             code="missing_key",
-        #             message="Must provide {missing_key} when creating a user."
-        #                     .format(missing_key=field))
-
         REQUIRED_USER_FIELDS = ("username", "email", "first_name", "last_name",
                                 "password")
         for field in REQUIRED_USER_FIELDS:
@@ -270,10 +248,6 @@ class CreateUserResource(ModelResource):
             raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
 
         bundle.obj.save()
-
-        # salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-        # activation_key = hashlib.sha1(salt+email).hexdigest()
-        # key_expires = datetime.datetime.today() + datetime.timedelta(2)
 
         activation_key, key_expires = gen_activation_key(email)
 
