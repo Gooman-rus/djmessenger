@@ -3,17 +3,20 @@ angular.module('DjMessenger.NavbarCtrl', [
         'ui.bootstrap',
     ])
 
-.controller('NavbarCtrl', function ($scope, $state, $location, serverOp) {
+.controller('NavbarCtrl', function ($scope, $state, $location, serverOp, UserService) {
     // navbar active link
     $scope.isActive = function (viewLocation) {
         return viewLocation === $location.path();
     };
 
+    $scope.setIsLoggedIn = UserService.setIsLoggedIn;
+
     $scope.checkLoggedIn = function() {
         serverOp.get('user/logged_in/')
             .success(function (check) {
-                $scope.logged_in = check.logged_in;
+//                $scope.logged_in = check.logged_in;
                 $scope.user_login = check.username;
+                $scope.setIsLoggedIn(check.logged_in);
                 console.log('Logged in = ' + $scope.logged_in);
             })
             .error(function (error) {
@@ -38,4 +41,10 @@ angular.module('DjMessenger.NavbarCtrl', [
                 console.log($scope.status);
             });
     }
+
+    $scope.$watch(
+        function () { return UserService.isLoggedIn(); },
+        function (value) {
+            $scope.logged_in = value;
+    })
 })

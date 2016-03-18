@@ -136,6 +136,20 @@ var DjMessenger = angular.module('DjMessenger', [
         return serverOp;
     }])
 
+    .factory("UserService", function () {
+        var loggedIn = false;
+        function isLoggedIn() {
+            return loggedIn;
+        }
+        function setIsLoggedIn(newLoggedIn) {
+            loggedIn = newLoggedIn;
+        }
+        return {
+            isLoggedIn: isLoggedIn,
+            setIsLoggedIn: setIsLoggedIn,
+        }
+    })
+
     // page title
     .directive('updateTitle', ['$rootScope', '$timeout',
         function($rootScope, $timeout) {

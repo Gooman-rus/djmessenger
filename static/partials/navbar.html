@@ -36,7 +36,7 @@
                 <li ng-if="logged_in == false" ng-class="{ active: isActive('/login') }">
                     <a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a>
                 </li>
-                <li ng-class="{ active: isActive('/profile/') }" ng-show="user_login.length > 0">
+                <li ng-class="{ active: isActive('/profile/') }" ng-show="logged_in == true">
                     <a href="#/profile/"
                        data-toggle="tooltip" data-placement="bottom" title="Profile">{{ user_login }}</a>
                 </li>

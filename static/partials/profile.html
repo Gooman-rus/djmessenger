@@ -1,20 +1,17 @@
-<div class="row" ng-show="wrongUserProfile == false">
+<div ng-show="successEmailChange == true">
+    <div class="page-header">
+        <h2>Email has been changed</h2>
+    </div>
+    <p>You need to confirm your email now.</p>
+</div>
+
+<div class="row" ng-show="wrongUserProfile == false && successEmailChange == false">
     <div class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-body">
                 <p class="text-center" ng-show="dataLoaded == false">
                     <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
                 </p>
-
-                <div ng-show="successEmailChange == true">
-                    <div class="row">
-                        <div class="col-md-12 lead">Email has been changed<hr></div>
-                        <p>You need to confirm your email now.</p>
-                    </div>
-
-
-                </div>
-
                 <div ng-show="showProfile && dataLoaded">
                     <div class="row">
                         <div class="col-md-12 lead">User profile<hr></div>

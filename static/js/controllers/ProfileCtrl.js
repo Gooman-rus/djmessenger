@@ -3,7 +3,8 @@ angular.module('DjMessenger.ProfileCtrl', [
     'ui.bootstrap',
 ])
 
-.controller('ProfileCtrl', function ($scope, $state, $stateParams, $timeout, $filter, serverOp) {
+.controller('ProfileCtrl', function ($scope, $state, $stateParams, $timeout, $filter, serverOp, UserService) {
+    $scope.setIsLoggedIn = UserService.setIsLoggedIn;
     $scope.wrongUserProfile = true;
     $scope.currentUser = true;
     $scope.showProfile = true;
@@ -36,6 +37,7 @@ angular.module('DjMessenger.ProfileCtrl', [
                 $scope.user_login = check.username;
                 if (!$scope.logged_in) {
                     $state.go('login');
+                    return;
                 }
                 if ($stateParams.userProfile) {
                     $scope.user_login = $stateParams.userProfile;
@@ -55,9 +57,11 @@ angular.module('DjMessenger.ProfileCtrl', [
                         $scope.status = 'Unable to GET data: ' + error;
                         console.log($scope.status);
                         $state.go('home');
+                        return;
                     });
 
                 $scope.emailChanged = false;
+                $scope.successEmailChange = false;
 
                 $scope.changeProfile = function(emailChanged) {
 
@@ -86,17 +90,19 @@ angular.module('DjMessenger.ProfileCtrl', [
                             $scope.dataLoaded = true;
                             $scope.showAlert('Your profile has been changed successfully.');
 
-
-                            serverOp.get('user/logout/')
-                                .success(function (data) {
-                                    $scope.successEmailChange = true;
-                                    $scope.showProfile = false;
-
-                                })
-                                .error(function (error) {
-                                    $scope.status = 'Unable to logout: ' + error;
-                                    console.log($scope.status);
-                                });
+                            if (emailChanged) {
+                                serverOp.get('user/logout/')
+                                    .success(function (data) {
+                                        $scope.successEmailChange = true;
+                                        $scope.showProfile = false;
+                                        $scope.setIsLoggedIn(false);
+                                    })
+                                    .error(function (error) {
+                                        $scope.status = 'Unable to logout: ' + error;
+                                        console.log($scope.status);
+                                    });
+                                $scope.successEmailChange = true;
+                            }
                         })
                         .error(function (error) {
                             $scope.status = 'UPDATE error: ' + error;
@@ -105,6 +111,10 @@ angular.module('DjMessenger.ProfileCtrl', [
 
                     $scope.emailChanged = false;
                     $scope.showProfile = true;
+
+                    $scope.$watch(function () { return UserService.isLoggedIn(); }, function (value) {
+                        $scope.logged_in = value;
+                    });
                 }
             })
             .error(function (error) {
