@@ -163,9 +163,9 @@ class UserResource(ModelResource):
         bundle.obj.last_name = bundle.data['last_name']
 
         #has email been changed?
-        print old_email
-        print bundle.data['email']
-        print bundle.obj.userprofile.activation_key
+        #print old_email
+        #print bundle.data['email']
+        #print bundle.obj.userprofile.activation_key
         #need_to_logout = False
         if old_email != bundle.data['email']:
             bundle.obj.is_active = False
